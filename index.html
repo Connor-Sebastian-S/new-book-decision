@@ -246,10 +246,51 @@
             overflow-y: auto;
             display: none;
         }
+
+        .intro-section {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    line-height: 1.5;
+}
+
+.intro-section p {
+    margin-bottom: 15px;
+}
+
+.intro-section ul {
+    margin-left: 20px;
+    margin-bottom: 15px;
+}
+
+.intro-section code {
+    background-color: #f5f5f5;
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-family: monospace;
+}
     </style>
 </head>
 <body>
     <h1>New Book Purchase Decision Maker</h1>
+
+    <div class="intro-section">
+    <p>Welcome to Book Selector! This tool helps you randomly choose a book to read from your collection.</p>
+    <p><strong>How to use:</strong></p>
+    <ul>
+        <li>A default book list is loaded automatically</li>
+        <li>Filter by genre using the dropdown menu</li>
+        <li>Click "Choose a book!" to get a random selection</li>
+    </ul>
+    <p><strong>To upload your own book list:</strong></p>
+    <ul>
+        <li>Create a CSV or Excel file with at least two columns: <code>TITLE</code> and <code>GENRE</code></li>
+        <li>Optional: Add an <code>ISBN</code> column for direct book lookup</li>
+        <li>Upload your file using the section below</li>
+    </ul>
+</div>
     
     <div class="upload-section">
         <h2>Upload Your Book List</h2>
