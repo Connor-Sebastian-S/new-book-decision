@@ -14,13 +14,13 @@
             padding: 20px;
             background-color: #f5f5f5;
         }
-
+        
         h1 {
             color: #2c3e50;
             text-align: center;
             margin-bottom: 30px;
         }
-
+        
         .upload-section {
             background-color: #fff;
             padding: 20px;
@@ -28,19 +28,19 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             margin-bottom: 30px;
         }
-
+        
         .upload-section h2 {
             margin-top: 0;
             color: #3498db;
         }
-
+        
         .file-input-container {
             display: flex;
             gap: 15px;
             align-items: center;
             margin-bottom: 20px;
         }
-
+        
         .file-input-container label {
             background-color: #3498db;
             color: white;
@@ -49,27 +49,27 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
-
+        
         .file-input-container label:hover {
             background-color: #2980b9;
         }
-
+        
         input[type="file"] {
             display: none;
         }
-
+        
         .file-name {
             font-size: 14px;
             color: #7f8c8d;
         }
-
+        
         .control-section {
             display: flex;
             gap: 15px;
             align-items: center;
             margin-bottom: 20px;
         }
-
+        
         select {
             padding: 10px;
             border-radius: 4px;
@@ -77,7 +77,7 @@
             font-size: 16px;
             min-width: 200px;
         }
-
+        
         button {
             background-color: #2ecc71;
             color: white;
@@ -88,16 +88,16 @@
             font-size: 16px;
             transition: background-color 0.3s;
         }
-
+        
         button:hover {
             background-color: #27ae60;
         }
-
+        
         button:disabled {
             background-color: #95a5a6;
             cursor: not-allowed;
         }
-
+        
         table {
             width: 100%;
             border-collapse: collapse;
@@ -105,22 +105,22 @@
             background-color: white;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
-
+        
         th, td {
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
-
+        
         th {
             background-color: #3498db;
             color: white;
         }
-
+        
         tr:hover {
             background-color: #f1f1f1;
         }
-
+        
         .result-section {
             text-align: center;
             padding: 30px;
@@ -129,7 +129,7 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             margin-top: 30px;
         }
-
+        
         .chosen-book {
             font-size: 32px;
             font-weight: bold;
@@ -139,7 +139,7 @@
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
             letter-spacing: 1px;
         }
-
+        
         .loading {
             display: inline-block;
             width: 20px;
@@ -150,40 +150,52 @@
             animation: spin 1s ease-in-out infinite;
             margin-right: 10px;
         }
-
+        
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-
+        
         .hidden {
             display: none;
         }
-
+        
         .pagination {
             display: flex;
             justify-content: center;
             margin-bottom: 20px;
         }
-
+        
         .pagination button {
             margin: 0 5px;
             background-color: #3498db;
         }
-
+        
         .pagination button.active {
             background-color: #2c3e50;
         }
-
+        
         .info-text {
             text-align: center;
             color: #7f8c8d;
             margin-bottom: 20px;
         }
+        
+        .debug-info {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 100px;
+            overflow-y: auto;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <h1>Book Selector</h1>
-
+    
     <div class="upload-section">
         <h2>Upload Your Book List</h2>
         <div class="file-input-container">
@@ -193,7 +205,7 @@
         </div>
         <p class="info-text">Default list is loaded automatically, or upload your own CSV/Excel file with TITLE and GENRE columns.</p>
     </div>
-
+    
     <div class="control-section">
         <label for="genreSelect">Genre choice:</label>
         <select id="genreSelect">
@@ -201,7 +213,7 @@
         </select>
         <button id="chooseBookBtn" disabled>Choose a book!</button>
     </div>
-
+    
     <div id="tableContainer">
         <div id="loadingIndicator">
             <span class="loading"></span> Loading books...
@@ -218,7 +230,7 @@
         <div class="pagination" id="pagination"></div>
         <p id="tableInfo" class="info-text"></p>
     </div>
-
+    
     <div class="result-section hidden" id="resultSection">
         <h2>Your Random Book Selection</h2>
         <div class="chosen-book" id="chosenBook"></div>
@@ -231,7 +243,7 @@
         let filteredBooks = [];
         const itemsPerPage = 10;
         let currentPage = 1;
-
+        
         // DOM Elements
         const fileInput = document.getElementById('fileInput');
         const fileName = document.getElementById('fileName');
@@ -244,7 +256,76 @@
         const loadingIndicator = document.getElementById('loadingIndicator');
         const pagination = document.getElementById('pagination');
         const tableInfo = document.getElementById('tableInfo');
-
+        
+        // Function to parse CSV string to JSON
+        function parseCSV(csvStr) {
+            // First, check if the CSV contains quoted fields with commas
+            const hasQuotedFields = csvStr.includes('"');
+            
+            const rows = [];
+            let currentRow = [];
+            let currentField = '';
+            let inQuotes = false;
+            
+            // Simple parser for CSV without quoted fields
+            if (!hasQuotedFields) {
+                const rowsSimple = csvStr.trim().split('\n');
+                for (let i = 0; i < rowsSimple.length; i++) {
+                    rows.push(rowsSimple[i].split(',').map(field => field.trim()));
+                }
+            } else {
+                // Advanced parser for CSV with quoted fields
+                for (let i = 0; i < csvStr.length; i++) {
+                    const char = csvStr[i];
+                    
+                    if (char === '"') {
+                        if (i + 1 < csvStr.length && csvStr[i + 1] === '"') {
+                            // Double quotes inside quoted field
+                            currentField += '"';
+                            i++; // Skip the next quote
+                        } else {
+                            // Toggle quote state
+                            inQuotes = !inQuotes;
+                        }
+                    } else if (char === ',' && !inQuotes) {
+                        // End of field
+                        currentRow.push(currentField.trim());
+                        currentField = '';
+                    } else if ((char === '\n' || char === '\r') && !inQuotes) {
+                        // End of row
+                        if (char === '\r' && i + 1 < csvStr.length && csvStr[i + 1] === '\n') {
+                            i++; // Skip the next \n in \r\n
+                        }
+                        
+                        // Don't add the field if it's the end of the line and the field is empty
+                        if (currentField !== '') {
+                            currentRow.push(currentField.trim());
+                            currentField = '';
+                        }
+                        
+                        // Only add non-empty rows
+                        if (currentRow.length > 0) {
+                            rows.push(currentRow);
+                            currentRow = [];
+                        }
+                    } else {
+                        // Regular character
+                        currentField += char;
+                    }
+                }
+                
+                // Add the last field and row if needed
+                if (currentField !== '') {
+                    currentRow.push(currentField.trim());
+                }
+                if (currentRow.length > 0) {
+                    rows.push(currentRow);
+                }
+            }
+            
+            return rows;
+        }
+        
         // Function to load CSV from URL
         async function loadDefaultCSV() {
             try {
@@ -256,77 +337,110 @@
                 alert('Failed to load the default book list. Please try uploading your own file.');
             }
         }
-
+        
         // Process CSV data
         function processCSV(data) {
-            const lines = data.trim().split('\n');
-            const headers = lines[0].split(',').map(header => header.trim());
-
-            // Validate that required columns exist
-            const titleIndex = headers.findIndex(h => h.toUpperCase() === 'TITLE');
-            const genreIndex = headers.findIndex(h => h.toUpperCase() === 'GENRE');
-
-            if (titleIndex === -1 || genreIndex === -1) {
-                alert('CSV file must contain TITLE and GENRE columns');
+            const rows = parseCSV(data);
+            
+            // Ensure we have at least a header row
+            if (rows.length === 0) {
+                alert('CSV file appears to be empty');
                 return;
             }
-
+            
+            const headers = rows[0].map(header => header.trim().toUpperCase());
+            
+            // Validate that required columns exist
+            const titleIndex = headers.indexOf('TITLE');
+            const genreIndex = headers.indexOf('GENRE');
+            
+            if (titleIndex === -1 || genreIndex === -1) {
+                alert(`CSV file must contain TITLE and GENRE columns. Found columns: ${headers.join(', ')}`);
+                return;
+            }
+            
             booksData = [];
+            
             // Start from index 1 to skip header row
-            for (let i = 1; i < lines.length; i++) {
-                const currentLine = lines[i].split(',');
-
-                // Skip empty lines
-                if (currentLine.length <= 1) continue;
-
-                const title = currentLine[titleIndex].trim().replace(/^"|"$/g, '');
-                const genre = currentLine[genreIndex].trim().replace(/^"|"$/g, '');
-
+            for (let i = 1; i < rows.length; i++) {
+                const currentRow = rows[i];
+                
+                // Skip rows that don't have enough columns
+                if (currentRow.length <= Math.max(titleIndex, genreIndex)) continue;
+                
+                const title = currentRow[titleIndex];
+                const genre = currentRow[genreIndex];
+                
                 if (title && genre) {
                     booksData.push({ title, genre });
                 }
             }
-
+            
+            console.log(`Successfully parsed ${booksData.length} books`);
+            
             populateGenreDropdown();
             filterBooks();
             booksTable.classList.remove('hidden');
             loadingIndicator.classList.add('hidden');
         }
-
+        
         // Process Excel files
         function processExcel(data) {
             const workbook = XLSX.read(data, { type: 'binary' });
             const firstSheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[firstSheetName];
-            const jsonData = XLSX.utils.sheet_to_json(worksheet);
-
-            // Validate that required columns exist
-            if (!jsonData.length || !jsonData[0].hasOwnProperty('TITLE') || !jsonData[0].hasOwnProperty('GENRE')) {
-                alert('Excel file must contain TITLE and GENRE columns');
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+            
+            // Validate that we have data
+            if (!jsonData.length) {
+                alert('Excel file appears to be empty');
                 return;
             }
-
-            booksData = jsonData.map(row => ({
-                title: row.TITLE.trim(),
-                genre: row.GENRE.trim()
-            }));
-
+            
+            const headers = jsonData[0].map(header => String(header).trim().toUpperCase());
+            
+            // Validate that required columns exist
+            const titleIndex = headers.indexOf('TITLE');
+            const genreIndex = headers.indexOf('GENRE');
+            
+            if (titleIndex === -1 || genreIndex === -1) {
+                alert(`Excel file must contain TITLE and GENRE columns. Found columns: ${headers.join(', ')}`);
+                return;
+            }
+            
+            booksData = [];
+            
+            // Start from index 1 to skip header row
+            for (let i = 1; i < jsonData.length; i++) {
+                const currentRow = jsonData[i];
+                
+                // Skip rows that don't have enough columns
+                if (!currentRow || currentRow.length <= Math.max(titleIndex, genreIndex)) continue;
+                
+                const title = String(currentRow[titleIndex] || '').trim();
+                const genre = String(currentRow[genreIndex] || '').trim();
+                
+                if (title && genre) {
+                    booksData.push({ title, genre });
+                }
+            }
+            
             populateGenreDropdown();
             filterBooks();
             booksTable.classList.remove('hidden');
             loadingIndicator.classList.add('hidden');
         }
-
+        
         // Populate genre dropdown
         function populateGenreDropdown() {
             // Clear existing options except "All Genres"
             while (genreSelect.options.length > 1) {
                 genreSelect.remove(1);
             }
-
+            
             // Get unique genres
             const genres = [...new Set(booksData.map(book => book.genre))].sort();
-
+            
             // Add genre options
             genres.forEach(genre => {
                 const option = document.createElement('option');
@@ -334,65 +448,65 @@
                 option.textContent = genre;
                 genreSelect.appendChild(option);
             });
-
+            
             // Enable choose button if we have data
             chooseBookBtn.disabled = booksData.length === 0;
         }
-
+        
         // Filter books by selected genre
         function filterBooks() {
             const selectedGenre = genreSelect.value;
-
+            
             if (selectedGenre === 'all') {
                 filteredBooks = [...booksData];
             } else {
                 filteredBooks = booksData.filter(book => book.genre === selectedGenre);
             }
-
+            
             currentPage = 1;
             displayBooks();
             updatePagination();
-
+            
             // Update info text
             tableInfo.textContent = `Showing ${filteredBooks.length} books${selectedGenre !== 'all' ? ` in the "${selectedGenre}" genre` : ''} out of ${booksData.length} total books`;
         }
-
+        
         // Display books in table
         function displayBooks() {
             // Clear existing rows
             tableBody.innerHTML = '';
-
+            
             // Calculate start and end indices for current page
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = Math.min(startIndex + itemsPerPage, filteredBooks.length);
-
+            
             // Create table rows
             for (let i = startIndex; i < endIndex; i++) {
                 const book = filteredBooks[i];
                 const row = document.createElement('tr');
-
+                
                 const titleCell = document.createElement('td');
                 titleCell.textContent = book.title;
                 row.appendChild(titleCell);
-
+                
                 const genreCell = document.createElement('td');
                 genreCell.textContent = book.genre;
                 row.appendChild(genreCell);
-
+                
                 tableBody.appendChild(row);
             }
         }
-
+        
         // Update pagination controls
         function updatePagination() {
             pagination.innerHTML = '';
-
+            
             const totalPages = Math.ceil(filteredBooks.length / itemsPerPage);
-
+            
             if (totalPages <= 1) {
                 return;
             }
-
+            
             // Previous button
             const prevBtn = document.createElement('button');
             prevBtn.textContent = '←';
@@ -405,17 +519,17 @@
                 }
             });
             pagination.appendChild(prevBtn);
-
+            
             // Page numbers
             const maxVisiblePages = 5;
             let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
             let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-
+            
             // Adjust startPage if we're near the end
             if (endPage - startPage + 1 < maxVisiblePages) {
                 startPage = Math.max(1, endPage - maxVisiblePages + 1);
             }
-
+            
             for (let i = startPage; i <= endPage; i++) {
                 const pageBtn = document.createElement('button');
                 pageBtn.textContent = i;
@@ -429,7 +543,7 @@
                 });
                 pagination.appendChild(pageBtn);
             }
-
+            
             // Next button
             const nextBtn = document.createElement('button');
             nextBtn.textContent = '→';
@@ -443,39 +557,39 @@
             });
             pagination.appendChild(nextBtn);
         }
-
+        
         // Choose a random book
         function chooseRandomBook() {
             if (filteredBooks.length === 0) {
                 alert('No books available in the selected genre');
                 return;
             }
-
+            
             const randomIndex = Math.floor(Math.random() * filteredBooks.length);
             const randomBook = filteredBooks[randomIndex];
-
+            
             chosenBook.textContent = randomBook.title;
             resultSection.classList.remove('hidden');
-
+            
             // Scroll to result section
             resultSection.scrollIntoView({ behavior: 'smooth' });
         }
-
+        
         // Event Listeners
         fileInput.addEventListener('change', (e) => {
             if (!e.target.files.length) return;
-
+            
             const file = e.target.files[0];
             fileName.textContent = file.name;
-
+            
             // Show loading indicator
             booksTable.classList.add('hidden');
             loadingIndicator.classList.remove('hidden');
             resultSection.classList.add('hidden');
-
+            
             // Process file based on type
             const reader = new FileReader();
-
+            
             if (file.name.endsWith('.csv')) {
                 reader.onload = (e) => {
                     processCSV(e.target.result);
@@ -491,10 +605,10 @@
                 loadingIndicator.classList.add('hidden');
             }
         });
-
+        
         genreSelect.addEventListener('change', filterBooks);
         chooseBookBtn.addEventListener('click', chooseRandomBook);
-
+        
         // Load SheetJS for Excel parsing (CDN)
         function loadExcelScript() {
             return new Promise((resolve, reject) => {
@@ -505,7 +619,7 @@
                 document.head.appendChild(script);
             });
         }
-
+        
         // Initialize
         async function init() {
             try {
@@ -516,7 +630,7 @@
                 loadingIndicator.textContent = 'Failed to initialize. Please refresh the page or try uploading your own file.';
             }
         }
-
+        
         init();
     </script>
 </body>
