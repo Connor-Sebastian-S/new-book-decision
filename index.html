@@ -8,280 +8,122 @@
     <link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
     <title>New Book Purchase Decision Maker</title>
     <style>
-        body {
-            font-family: 'Alegreya', serif;
-            font-weight: 400; /* Regular weight */
-            line-height: 1.6;
-            color: #ffffff;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-            transition: background-image 0.5s ease-in-out;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-        
-        h1 {
-            font-family: 'Alegreya', serif;
-            font-weight: 700;
-            color: #ffffff;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .upload-section {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
-        
-        .upload-section h2 {
-            font-family: 'Alegreya', serif;
-            font-weight: 700;
-            margin-top: 0;
-            color: #ffffff;
-        }
-        
-        .file-input-container {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .file-input-container label {
-            background-color: #3498db;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        .file-input-container label:hover {
-            background-color: #2980b9;
-        }
-        
-        input[type="file"] {
-            display: none;
-        }
-        
-        .file-name {
-            font-size: 14px;
-            color: #7f8c8d;
-        }
-        
-        .control-section {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        select {
-            padding: 10px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-            font-size: 16px;
-            min-width: 200px;
-        }
-        
-        button {
-            background-color: #2ecc71;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        
-        button:hover {
-            background-color: #27ae60;
-        }
-        
-        button:disabled {
-            background-color: #95a5a6;
-            cursor: not-allowed;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-            background-color: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        th {
-            background-color: #3498db;
-            color: white;
-        }
-        
-        tr:hover {
-            background-color: #f1f1f1;
-        }
-        
-        .result-section {
-            text-align: center;
-            padding: 30px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-top: 30px;
-        }
-        
-        .chosen-book {
-            font-size: 32px;
-            font-weight: bold;
-            color: #2c3e50;
-            margin: 20px 0;
-            font-family: 'Georgia', serif;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-            letter-spacing: 1px;
-        }
-        
-        .book-details {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .book-isbn {
-            font-size: 18px;
-            color: #7f8c8d;
-            margin-top: 10px;
-        }
-        
-        .book-cover {
-            max-width: 150px;
-            margin: 20px 0;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            border-radius: 4px;
-        }
-        
-        .search-links {
-            margin-top: 15px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        
-        .search-link {
-            background-color: #3498db;
-            color: white;
-            padding: 8px 12px;
-            text-decoration: none;
-            border-radius: 4px;
-            display: inline-flex;
-            align-items: center;
-            transition: background-color 0.3s;
-        }
-        
-        .search-link:hover {
-            background-color: #2980b9;
-        }
-        
-        .search-link img {
-            height: 16px;
-            margin-right: 5px;
-        }
-        
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(0,0,0,0.3);
-            border-radius: 50%;
-            border-top-color: #3498db;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .isbn-loading {
-            display: inline-block;
-            font-size: 16px;
-            color: #7f8c8d;
-            margin: 10px 0;
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .pagination {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        
-        .pagination button {
-            margin: 0 5px;
-            background-color: #3498db;
-        }
-        
-        .pagination button.active {
-            background-color: #2c3e50;
-        }
-        
-        .info-text {
-            text-align: center;
-            color: #7f8c8d;
-            margin-bottom: 20px;
-        }
-        
-        .debug-info {
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-top: 20px;
-            font-family: monospace;
-            font-size: 12px;
-            max-height: 100px;
-            overflow-y: auto;
-            display: none;
-        }
+        /* Base styles */
+body {
+    font-family: 'Alegreya', serif;
+    font-weight: 400;
+    line-height: 1.6;
+    color: #ffffff;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
 
-        .intro-section {
-    background-color: #fff;
+/* Headers */
+h1, h2, h3, th {
+    font-weight: 700;
+    color: #3498db; /* Using brand blue for headers */
+    margin: 0 0 1rem;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #2ecc71; /* Using brand green for main heading */
+}
+
+/* Sections */
+.upload-section,
+.intro-section,
+.result-section,
+table {
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     margin-bottom: 30px;
-    line-height: 1.5;
+    backdrop-filter: blur(2px); /* Optional subtle blur effect */
 }
 
-.intro-section p {
-    margin-bottom: 15px;
+/* Table specific styles */
+table {
+    margin-bottom: 30px;
+    background-color: rgba(255, 255, 255, 0.9);
 }
 
-.intro-section ul {
-    margin-left: 20px;
-    margin-bottom: 15px;
+th {
+    background-color: rgba(52, 152, 219, 0.9); /* Semi-transparent blue */
+    color: white;
 }
 
-.intro-section code {
-    background-color: #f5f5f5;
-    padding: 2px 5px;
-    border-radius: 3px;
-    font-family: monospace;
+/* Form elements */
+.file-input-container label {
+    background-color: #3498db; /* Brand blue */
+    color: white;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
+
+button {
+    background-color: #2ecc71; /* Brand green */
+    color: white;
+    padding: 10px 15px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+/* Result section */
+.chosen-book {
+    font-size: 32px;
+    font-weight: 700; /* Bold */
+    color: #2c3e50;
+    margin: 20px 0;
+    font-family: 'Alegreya', serif; /* Consistent font */
+}
+
+.search-link {
+    background-color: #3498db; /* Brand blue */
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+/* Interactive states */
+button:hover, 
+.file-input-container label:hover, 
+.search-link:hover {
+    opacity: 0.9;
+}
+
+button:disabled {
+    background-color: #95a5a6;
+}
+
+/* Consistent form controls */
+select, button, input {
+    font-family: inherit; /* Ensure form elements use Alegreya */
+}
+
+/* Text contrast adjustments */
+.upload-section h2,
+.intro-section,
+.result-section {
+    color: #2c3e50; /* Dark text for better contrast */
+}
+
+.file-name,
+.book-isbn,
+.info-text {
+    color: #7f8c8d;
+}
+
+/* Remove redundant font-family declarations */
     </style>
 </head>
 <body>
