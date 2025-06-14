@@ -502,7 +502,7 @@ body {
         // Function to load CSV from URL
         async function loadDefaultCSV() {
             try {
-                const response = await fetch('https://raw.githubusercontent.com/Connor-Sebastian-S/new-book-decision/refs/heads/main/books.csv');
+                const response = await fetch('https://raw.githubusercontent.com/Connor-Sebastian-S/new-book-decision/main/books.csv');
                 const data = await response.text();
                 processCSV(data);
             } catch (error) {
