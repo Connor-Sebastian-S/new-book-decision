@@ -222,6 +222,10 @@
             background: linear-gradient(45deg, #0064d2, #003087);
         }
 
+        .vinted {
+            background: linear-gradient(45deg, #00a1a7, #007b7f);
+        }
+
         .loading {
             text-align: center;
             color: white;
@@ -300,6 +304,9 @@
                 </a>
                 <a href="#" class="link-btn ebay" id="ebayLink" target="_blank">
                     🔍 Search on eBay UK
+                </a>
+                <a href="#" class="link-btn vinted" id="vintedLink" target="_blank">
+                    👕 Search on Vinted UK
                 </a>
             </div>
         </div>
@@ -407,6 +414,7 @@
             const selectedGenre = document.getElementById('selectedGenre');
             const amazonLink = document.getElementById('amazonLink');
             const ebayLink = document.getElementById('ebayLink');
+            const vintedLink = document.getElementById('vintedLink');
             
             selectedTitle.textContent = book.TITLE;
             selectedGenre.textContent = book.GENRE;
@@ -415,6 +423,7 @@
             const searchQuery = encodeURIComponent(book.TITLE);
             amazonLink.href = `https://www.amazon.co.uk/s?k=${searchQuery}&ref=nb_sb_noss`;
             ebayLink.href = `https://www.ebay.co.uk/sch/i.html?_nkw=${searchQuery}`;
+            vintedLink.href = `https://www.vinted.co.uk/catalog?search_text=${searchQuery}`;
             
             selectedBookDiv.style.display = 'block';
             
