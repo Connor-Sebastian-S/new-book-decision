@@ -342,6 +342,7 @@
                         populateGenreFilter();
                         displayBooks();
                         updateStats();
+                        loadFromURL(); // Load genre from URL if present
                     },
                     error: function(error) {
                         showError('Error parsing CSV: ' + error.message);
@@ -373,6 +374,9 @@
         
         function filterBooks() {
             const selectedGenre = document.getElementById('genreFilter').value;
+            
+            // Update URL when genre changes
+            updateURL(selectedGenre);
             
             if (selectedGenre === '') {
                 filteredBooks = [...allBooks];
@@ -456,6 +460,42 @@
             }
         }
         
+        function updateURL(genre) {
+            if (genre) {
+                // Convert genre to URL-friendly format (lowercase, replace spaces with hyphens)
+                const genreSlug = genre.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
+                window.history.pushState({genre: genre}, '', `#${genreSlug}`);
+            } else {
+                window.history.pushState({genre: ''}, '', window.location.pathname);
+            }
+        }
+        
+        function loadFromURL() {
+            const hash = window.location.hash.substring(1); // Remove the # symbol
+            if (hash) {
+                // Convert URL slug back to genre name by finding matching genre
+                const matchingGenre = allBooks.find(book => {
+                    const genreSlug = book.GENRE.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9\-]/g, '');
+                    return genreSlug === hash;
+                })?.GENRE;
+                
+                if (matchingGenre) {
+                    document.getElementById('genreFilter').value = matchingGenre;
+                    filterBooks();
+                }
+            }
+        }
+        
+        function handlePopState(event) {
+            if (event.state && event.state.genre !== undefined) {
+                document.getElementById('genreFilter').value = event.state.genre;
+                filterBooks();
+            } else {
+                // Handle direct URL access
+                loadFromURL();
+            }
+        }
+        
         function showError(message) {
             const bookGrid = document.getElementById('bookGrid');
             bookGrid.innerHTML = `<div class="error">${message}</div>`;
@@ -463,6 +503,9 @@
         
         // Load books when page loads
         window.addEventListener('load', loadBooks);
+        
+        // Handle browser back/forward buttons
+        window.addEventListener('popstate', handlePopState);
     </script>
 </body>
 </html>
